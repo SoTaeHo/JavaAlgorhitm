@@ -52,7 +52,7 @@ public class Main {
 		}
 		updateRange(tree, lazy, node * 2, left, right, start, (start + end) / 2, diff);
 		updateRange(tree, lazy, node * 2 + 1, left, right, (start + end) / 2 + 1, end, diff);
-		tree[node] = tree[node * 2] + tree[node * 2 + 1];
+		// tree[node] = tree[node * 2] + tree[node * 2 + 1];
 	}
 
 	static long query(long[] tree, long[] lazy, int node, int left, int right, int start, int end) {
