@@ -12,6 +12,7 @@
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -22,14 +23,10 @@ public class Main {
             return;
         }
         if (l <= s && e <= r) {
-            if (lazy[node] != 0) {
-                tree[node] += (e - s + 1);
-                if (s != e) {
-                    // 딸깍 횟수 +1
-                    lazy[node * 2] += 1;
-                    lazy[node * 2 + 1] += 1;
-                }
-                lazy[node] = 0;
+            tree[node] = (e - s + 1) - tree[node];
+            if (s != e) {
+                lazy[node * 2] += 1;
+                lazy[node * 2 + 1] += 1;
             }
             return;
         }
@@ -39,22 +36,26 @@ public class Main {
         tree[node] = tree[node * 2] + tree[node * 2 + 1];
     }
 
-    static int query(int[] tree, int node, int s, int e, int l, int r) {
+    static int query(int[] tree, int[] lazy, int node, int s, int e, int l, int r) {
+        updateLazy(tree, lazy, node, s, e);
         if (e < l || r < s) {
             return 0;
         }
-        if (l <= s && e <= r) {]
-            return 
+        if (l <= s && e <= r) {
+            return tree[node];
         }
+        int m = (s + e) / 2;
+        int lsum = query(tree, lazy, node * 2, s, m, l, r);
+        int rsum = query(tree, lazy, node * 2 + 1, m + 1, e, l, r);
+        return lsum + rsum;
     }
 
     static void updateLazy(int[] tree, int[] lazy, int node, int s, int e) {
-        if (lazy[node] != 0) {
-            tree[node] += (e - s + 1) * lazy[node];
+        if (lazy[node] % 2 == 1) {
+            tree[node] = (e - s + 1) - tree[node];
             if (s != e) {
-                // 딸깍 횟수 +1
-                lazy[node * 2] += 1;
-                lazy[node * 2 + 1] += 1;
+                lazy[node * 2] += lazy[node];
+                lazy[node * 2 + 1] += lazy[node];
             }
             lazy[node] = 0;
         }
@@ -67,7 +68,6 @@ public class Main {
         int N = Integer.parseInt(st.nextToken());
         int M = Integer.parseInt(st.nextToken());
 
-        int[] arr = new int[N + 1];
         int[] tree = new int[4 * (N + 1)];
         int[] lazy = new int[4 * (N + 1)];
 
@@ -78,14 +78,14 @@ public class Main {
             if (O == 1) {
                 int S = Integer.parseInt(st.nextToken());
                 int T = Integer.parseInt(st.nextToken());
-
-                query();
+                System.out.println(query(tree, lazy, 1, 0, N - 1, S - 1, T - 1));
             } else {
                 int S = Integer.parseInt(st.nextToken());
                 int T = Integer.parseInt(st.nextToken());
-
-                update();
+                updateRange(tree, lazy, 1, 0, N - 1, S - 1, T - 1);
             }
+            // System.out.println(Arrays.toString(tree));
+            // System.out.println(Arrays.toString(lazy));
         }
 
     }
