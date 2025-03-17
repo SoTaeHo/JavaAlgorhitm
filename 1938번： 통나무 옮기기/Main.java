@@ -56,14 +56,23 @@ public class Main {
             }
         }
         System.out.println(bfs(bx, by, ex, ey));
-        // // 출력
-        // for (int i = 0; i < n; i++) {
-        // for (int j = 0; j < n; j++) {
-        // System.out.printf("%2d ", visited[i][j]);
-        // }
-        // System.out.println();
-        // }
-        // System.out.println(visited[ex][ey]);
+        
+        System.out.println("============================");
+        
+        for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+        System.out.printf("%2d ", visited[i][j][1]);
+        }
+        System.out.println();
+        }
+        System.out.println("=============================");
+        // 출력
+        for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+        System.out.printf("%2d ", visited[i][j][0]);
+        }
+        System.out.println();
+        }
     }
 
     static boolean isValid(int r, int c) {
@@ -101,7 +110,7 @@ public class Main {
                 int nx = p.x - 1;
                 int ny = p.y;
                 int nnx = p.x - 2;
-                if (isValid(nnx, ny) && visited[nx][ny][bDir] == 0 && map[nx][ny] != '1') {
+                if (isValid(nnx, ny) && visited[nx][ny][bDir] == 0 && map[nnx][ny] != '1') {
                     q.offer(new Point(nx, ny, bDir));
                     visited[nx][ny][bDir] = visited[x][y][bDir] + 1;
                 }
@@ -109,42 +118,45 @@ public class Main {
                 nx = p.x + 1;
                 ny = p.y;
                 nnx = p.x + 2;
-                if (isValid(nnx, ny) && visited[nx][ny][bDir] == 0 && map[nx][ny] != '1') {
+                if (isValid(nnx, ny) && visited[nx][ny][bDir] == 0 && map[nnx][ny] != '1') {
                     q.offer(new Point(nx, ny, bDir));
                     visited[nx][ny][bDir] = visited[x][y][bDir] + 1;
                 }
                 // left
                 nx = p.x;
                 ny = p.y - 1;
-                if (isValid(nx, ny) && visited[nx][ny][bDir] == 0 && map[nx][ny] != '1') {
+                if (isValid(nx - 1, ny) && isValid(nx + 1, ny) && isValid(nx, ny) && visited[nx][ny][bDir] == 0 && map[nx][ny] != '1' && map[nx - 1][ny] != '1' && map[nx + 1][ny] != '1') {
                     q.offer(new Point(nx, ny, bDir));
                     visited[nx][ny][bDir] = visited[x][y][bDir] + 1;
                 }
                 // right
                 nx = p.x;
                 ny = p.y + 1;
-                if (isValid(nnx, ny) && visited[nx][ny][bDir] == 0 && map[nx][ny] != '1') {
+                if (isValid(nx - 1, ny) && isValid(nx + 1, ny) && isValid(nx, ny) && visited[nx][ny][bDir] == 0 && map[nx][ny] != '1' && map[nx - 1][ny] != '1' && map[nx + 1][ny] != '1') {
                     q.offer(new Point(nx, ny, bDir));
                     visited[nx][ny][bDir] = visited[x][y][bDir] + 1;
+                    System.out.printf("nx : %d, ny : %d, bdir ; %d\n", nx, ny, bDir);
+                    System.out.println(visited[nx][ny][bDir]);
+                    System.out.println(visited[x][y][bDir]);
                 }
                 // turn
-                if (isRotate(p.x, p.y)) {
-                    visited[x][y][0] = visited[x][y][1] + 1;
+                if (isRotate(p.x, p.y) && visited[p.x][p.y][0] == 0) {
+                    visited[p.x][p.y][0] = visited[p.x][p.y][1] + 1;
                     bDir = 0;
-                    q.offer(new Point(x, y, bDir));
+                    q.offer(new Point(p.x, p.y, bDir));
                 }
             } else { // 가로
                 // up
                 int nx = p.x - 1;
                 int ny = p.y;
-                if (isValid(nx, ny) && visited[nx][ny][bDir] == 0 && map[nx][ny] != '1') {
+                if (isValid(nx, ny - 1) && isValid(nx, ny + 1) && isValid(nx, ny) && visited[nx][ny][bDir] == 0 && map[nx][ny] != '1' && map[nx][ny - 1] != '1' && map[nx][ny + 1] != '1') {
                     q.offer(new Point(nx, ny, bDir));
                     visited[nx][ny][bDir] = visited[x][y][bDir] + 1;
                 }
                 // down
                 nx = p.x + 1;
                 ny = p.y;
-                if (isValid(nx, ny) && visited[nx][ny][bDir] == 0 && map[nx][ny] != '1') {
+                if (isValid(nx, ny - 1) && isValid(nx, ny + 1) && isValid(nx, ny) && visited[nx][ny][bDir] == 0 && map[nx][ny] != '1' && map[nx][ny - 1] != '1' && map[nx][ny + 1] != '1') {                    
                     q.offer(new Point(nx, ny, bDir));
                     visited[nx][ny][bDir] = visited[x][y][bDir] + 1;
                 }
@@ -152,7 +164,7 @@ public class Main {
                 nx = p.x;
                 ny = p.y - 1;
                 int nny = p.y - 2;
-                if (isValid(nx, nny) && visited[nx][ny][bDir] == 0 && map[nx][ny] != '1') {
+                if (isValid(nx, nny) && visited[nx][ny][bDir] == 0 && map[nx][nny] != '1') {
                     q.offer(new Point(nx, ny, bDir));
                     visited[nx][ny][bDir] = visited[x][y][bDir] + 1;
                 }
@@ -160,15 +172,15 @@ public class Main {
                 nx = p.x;
                 ny = p.y + 1;
                 nny = p.y + 2;
-                if (isValid(nx, nny) && visited[nx][ny][bDir] == 0 && map[nx][ny] != '1') {
+                if (isValid(nx, nny) && visited[nx][ny][bDir] == 0 && map[nx][nny] != '1') {
                     q.offer(new Point(nx, ny, bDir));
                     visited[nx][ny][bDir] = visited[x][y][bDir] + 1;
                 }
                 // turn
-                if (isRotate(p.x, p.y)) {
-                    visited[x][y][1] = visited[x][y][0] + 1;
+                if (isRotate(p.x, p.y) && visited[p.x][p.y][1] == 0) {
+                    visited[p.x][p.y][1] = visited[p.x][p.y][0] + 1;
                     bDir = 1;
-                    q.offer(new Point(x, y, bDir));
+                    q.offer(new Point(p.x, p.y, bDir));
                 }
             }
         }
