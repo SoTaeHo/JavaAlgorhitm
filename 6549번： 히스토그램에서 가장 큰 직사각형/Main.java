@@ -12,61 +12,85 @@
 /* ************************************************************************** */
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 
 public class Main {
 
-    static void init(long[] tree, long[] low, int[] arr, int node, int s, int e) {
-        if(s == e) {
-            tree[node] = arr[s];
-            low[node] = arr[s];
+    static int init(int[] tree, int[] arr, int node, int s, int e) {
+        if (s == e) {
+            tree[node] = s;
+            return s;
         } else {
             int mid = (s + e) / 2;
-            init(tree, low, arr, node * 2, s, mid);
-            init(tree, low, arr, node * 2 + 1, mid + 1, e);
-            long small = Math.min(tree[node * 2], tree[node * 2 + 1]);
-            long big = Math.max(tree[node * 2], tree[node * 2 + 1]);
+            int left = init(tree, arr, node * 2, s, mid);
+            int right = init(tree, arr, node * 2 + 1, mid + 1, e);
 
-            low[node] = Math.min(low[node * 2], low[node * 2 + 1]);
-            tree[node] = Math.max(low[node] * (e - s + 1), big);
+            if (arr[left] > arr[right]) {
+                tree[node] = right;
+                return right;
+            } else {
+                tree[node] = left;
+                return left;
+            }
         }
     }
 
-    static long query(long[] tree, int node, int s, int e, int l, int r) {
-        if(e < l || r < s) {
+    static int find(int[] tree, int[] arr, int node, int s, int e, int l, int r) {
+        if (e < l || r < s) {
             return 0;
         }
-        if(l <= s && e <= r) {
+        if (l <= s && e <= r) {
+            // System.out.println("call");
+            // System.out.printf("%d, %d, %d, %d\n", l, s, e, r);
+            // System.out.println(tree[node]);
+            // Scanner sc = new Scanner(System.in);
+            // sc.nextLine();
             return tree[node];
         }
-        int mid = (s + e) >>> 2;
-        long left = query(tree, node * 2, s, mid, l, r);
-        long right = query(tree, node * 2 + 1, mid + 1, e, l, r);
-        long small = Math.min(left, right);
-        long big = Math.max(left, right);
-        return Math.max(big, small * 2);
+        int mid = (s + e) / 2;
+        int left = find(tree, arr, node * 2, s, mid, l, r);
+        int right = find(tree, arr, node * 2 + 1, mid + 1, e, l, r);
+
+        if (arr[left] > arr[right])
+            return right;
+        else
+            return left;
+
     }
+
+    static long query(int[] tree, int[] arr, int n, int l, int r) {
+        if (l > r) {
+            return 0;
+        }
+        int idx = find(tree, arr, 1, 1, n, l, r);
+        // System.out.println("idx : " + idx);
+        long maxNum = (r - l + 1) * (long) arr[idx];
+        maxNum = Math.max(maxNum, query(tree, arr, n, l, idx - 1));
+        maxNum = Math.max(maxNum, query(tree, arr, n, idx + 1, r));
+        return maxNum;
+    }
+
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        
-        while(true) {
+
+        while (true) {
             StringTokenizer st = new StringTokenizer(br.readLine());
             int n = Integer.parseInt(st.nextToken());
-            if(n == 0) {
+            if (n == 0) {
                 break;
             }
 
-            int[] arr = new int[n];
-            for(int i = 0; i < n; i++) {
+            int[] arr = new int[n + 1];
+            arr[0] = Integer.MAX_VALUE;
+            for (int i = 1; i <= n; i++) {
                 arr[i] = Integer.parseInt(st.nextToken());
             }
-            long[] tree = new long[4 * n];
-            long[] low = new long[4 * n];
+            int[] tree = new int[4 * n];
 
-            init(tree, low, arr, 1, 0, n - 1);
-            System.out.println(tree[1]);
+            init(tree, arr, 1, 1, n);
+            System.out.println(query(tree, arr, n, 1, n));
         }
-
-
     }
 }
