@@ -32,7 +32,6 @@ public class Main {
         for (int i = 0; i < n; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
         }
-
         subset(0, 0, true, n, s);
         System.out.println(result);
     }
