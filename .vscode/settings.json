@@ -4,5 +4,7 @@
   "notebook.defaultFormatter": "esbenp.prettier-vscode",
   "[java]": {
     "editor.defaultFormatter": "redhat.java"
-  }
+  },
+  "BOJ.author": "thxogh1",
+  "BOJ.extension": "java"
 }
