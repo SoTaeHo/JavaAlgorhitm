@@ -13,12 +13,15 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
+    static int[] parent;
+    static int[] rank;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -36,11 +39,12 @@ public class Main {
             }
         }
         PriorityQueue<Edge> q = new PriorityQueue<>((o1, o2) -> Integer.compare(o1.weight, o2.weight));
+        int cnt = bfs(map);
         // 간선 찾기 : 가로
         for (int i = 1; i < n + 1; i++) {
             int start = 1;
             while (start < m) {
-                while (start < m + 1 && map[i][start] == 1) {
+                while (start < m + 1 && map[i][start] >= 1) {
                     start++;
                 }
                 int end = start;
@@ -56,18 +60,17 @@ public class Main {
                     start = end;
                     continue;
                 } else {
-                    q.offer(new Edge(new Point(i, start), new Point(i, end), end - start));
-                    System.out.printf("i : %d / start : %d, end : %d\n", i, start, end);
+                    q.offer(new Edge(new Point(i, start - 1, map[i][start - 1]), new Point(i, end, map[i][end]),
+                            end - start));
                     start = end;
                 }
             }
         }
-        System.out.println(q.size());
 
-        for (int i = 1; i < m + 1; i++) {
+        for (int i = 1; i < m + 1; i++) { // 간선 찾기 : 세로로
             int start = 1;
             while (start < n) {
-                while (start < n + 1 && map[start][i] == 1) {
+                while (start < n + 1 && map[start][i] >= 1) {
                     start++;
                 }
                 int end = start;
@@ -83,73 +86,166 @@ public class Main {
                     start = end;
                     continue;
                 } else {
-                    q.offer(new Edge(new Point(i, start), new Point(i, end), end - start));
+                    q.offer(new Edge(new Point(start - 1, i, map[start - 1][i]), new Point(end, i, map[end][i]),
+                            end - start));
                     start = end;
                 }
             }
         }
-        System.out.println(q.size());
+
         int ans = 0;
-        do {
-            System.out.println("bfs");
+        parent = new int[cnt + 1];
+        rank = new int[cnt + 1];
+        for (int i = 1; i < cnt + 1; i++) {
+            parent[i] = i;
+            rank[i] = 1;
+        }
+        cnt = 1;
+        while (!q.isEmpty()) {
             Edge e = q.poll();
-            ans += e.weight;
-            if (e.start.x == e.end.x) { // 가로
-                for (int i = e.start.y; i < e.end.y; i++) {
-                    map[e.end.x][i] = 2;
-                }
-            } else {
-                for (int i = e.start.x; i < e.end.x; i++) {
-                    map[i][e.end.y] = 2;
-                }
+
+            if (find(e.start.type) != find(e.end.type)) {
+                union(e.start.type, e.end.type);
+                cnt++;
+                ans += e.weight;
             }
-        } while (!bfs(map));
-        System.out.println(ans != 0 ? ans : -1);
+        }
+        if (cnt != parent.length - 1) {
+            System.out.println(-1);
+        } else {
+            System.out.println(ans);
+        }
+        // while (!q.isEmpty()) {
+        // Edge e = q.poll();
+        // if (connected[e.start.type] && connected[e.end.type]) {
+        // continue;
+        // } else if (e.start.type == e.end.type) {
+        // continue;
+        // }
+        // ans += e.weight;
+        // // System.out.printf("(%d, %d)\n", e.start.x, e.start.y);
+        // // System.out.printf("(%d, %d)\n", e.end.x, e.end.y);
+        // if (e.start.x == e.end.x) {
+        // for (int i = e.start.y + 1; i < e.weight + e.start.y + 1; i++) {
+        // map[e.start.x][i] = 9;
+        // }
+        // } else {
+        // for (int i = e.start.x + 1; i < e.weight + e.start.x + 1; i++) {
+        // map[i][e.start.y] = 8;
+        // }
+        // }
+        // connected[e.start.type] = true;
+        // connected[e.end.type] = true;
+
+        // }
+        // cnt = bfs(map);
+        // System.out.println();
+        // for (int i = 1; i < n + 1; i++) {
+        // for (int j = 1; j < m + 1; j++) {
+        // System.out.print(map[i][j] + " ");
+        // }
+        // System.out.println();
+        // }
+        // System.out.println(cnt == 1 ? ans : -1);
     }
 
-    static boolean bfs(int[][] map) {
+    static int find(int x) {
+        if (parent[x] != x) {
+            parent[x] = find(parent[x]);
+        }
+        return parent[x];
+    }
+
+    static void union(int a, int b) {
+        int rootA = find(a);
+        int rootB = find(b);
+
+        if (rootA != rootB) {
+            if (rank[rootA] > rank[rootB]) {
+                parent[rootB] = rootA;
+            } else if (rank[rootB] > rank[rootA]) {
+                parent[rootA] = rootB;
+            } else {
+                parent[rootB] = rootA;
+                rank[rootA]++;
+            }
+        }
+    }
+
+    static int bfs(int[][] map) {
         Queue<Point> q = new ArrayDeque<>();
         boolean[][] visisted = new boolean[map.length][map[0].length];
         int[] dx = { -1, 1, 0, 0 };
         int[] dy = { 0, 0, -1, 1 };
-        boolean check = false;
-        for (int i = 1; i < map.length; i++) {
-            for (int j = 1; j < map[0].length; j++) {
-                if (map[i][j] == 1 && !visisted[i][j]) {
-                    System.out.println("check");
-                    q.offer(new Point(i, j));
-                    visisted[i][j] = true;
-                    while (!q.isEmpty()) {
-                        Point p = q.poll();
+        int cnt = 0;
+        for (int i = 1; i < map.length - 1; i++) {
+            for (int j = 1; j < map[0].length - 1; j++) {
+                if (map[i][j] == 0 || visisted[i][j])
+                    continue;
+                cnt++;
+                q.offer(new Point(i, j, map[i][j]));
+                visisted[i][j] = true;
+                map[i][j] = cnt;
 
-                        for (int k = 0; i < 4; i++) {
-                            int nx = p.x + dx[k];
-                            int ny = p.y + dy[k];
+                while (!q.isEmpty()) {
+                    Point p = q.poll();
+                    for (int k = 0; k < 4; k++) {
+                        int nx = p.x + dx[k];
+                        int ny = p.y + dy[k];
 
-                            if (map[nx][ny] == 0 || visisted[nx][ny]) {
-                                continue;
-                            }
-                            visisted[nx][ny] = true;
-                            q.offer(new Point(nx, ny));
+                        // if (map[nx][ny] == 9 && nx != p.x) { // 가로
+                        // continue;
+                        // }
+                        // if (map[p.x][p.y] == 9 && nx != p.x) {
+                        // continue;
+                        // }
+                        // if (map[nx][ny] == 8 && ny != p.y) { // 세로
+                        // continue;
+                        // }
+                        // if (map[p.x][p.y] == 8 && ny != p.y) {
+                        // continue;
+                        // }
+                        if (map[nx][ny] == 0 || visisted[nx][ny]) {
+                            continue;
                         }
-                    }
-                    check = true;
-                } else if (check && map[i][j] == 1 && !visisted[i][j]) {
-                    return false;
-                }
+                        visisted[nx][ny] = true;
+                        map[nx][ny] = cnt;
+                        q.offer(new Point(nx, ny, map[nx][ny]));
 
+                        // if (map[nx][ny] == 8 || map[nx][ny] == 9) {
+                        // map[nx][ny] = 17;
+                        // q.offer(new Point(nx, ny, map[nx][ny]));
+                        // } else {
+                        // map[nx][ny] = cnt;
+                        // q.offer(new Point(nx, ny, map[nx][ny]));
+                        // }
+                    }
+                    // for (int l = 1; l < map.length - 1; l++) {
+                    // for (int a = 1; a < map[0].length - 1; a++) {
+                    // if (visisted[l][a])
+
+                    // System.out.print(1 + " ");
+                    // else
+                    // System.out.print(0 + " ");
+                    // }
+                    // System.out.println();
+                    // }
+                    // System.out.println();
+                }
             }
         }
-        return true;
+        return cnt;
     }
 
     static class Point {
         int x;
         int y;
+        int type;
 
-        public Point(int x, int y) {
+        public Point(int x, int y, int type) {
             this.x = x;
             this.y = y;
+            this.type = type;
         }
     }
 
