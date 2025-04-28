@@ -43,6 +43,6 @@ public class Main {
         for (int num : ans) {
             sb.append(num).append(" ");
         }
-        System.out.println(sb;);
+        System.out.println(sb);
     }
 }
