@@ -1,3 +1,4 @@
+
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                      :::    :::    :::     */
@@ -24,27 +25,30 @@ public class Main {
 
         int[] xPos = new int[n];
         int[] yPos = new int[n];
-
-        for(int i = 0; i < n; i++) {
+        int total = 0;
+        int[][] dp = new int[500][500];
+        for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
             xPos[i] = Integer.parseInt(st.nextToken());
             yPos[i] = Integer.parseInt(st.nextToken());
+
         }
 
-        int[] dist = new int[n];
-        
-        for (int i = 1; i < n - 1; i++) {
-            dist[i] = Math.abs(xPos[i - 1] - xPos[i]) + Math.abs(yPos[i - 1] - yPos[i])
-            + Math.abs(xPos[i + 1] - xPos[i]) + Math.abs(yPos[i + 1] - yPos[i]);
+        for (int i = 1; i < n; i++) {
+            total += Math.abs(xPos[i] - xPos[i - 1]) + Math.abs(yPos[i] - yPos[i - 1]);
         }
 
+        for (int i = 0; i < n; i++) {
+            dp[0][i] = total;
+        }
+
+        for (int i = 1; i <= k; i++) {
+            for (int j = 1; j < n - 1; j++) {
+                for (int l = 1; l < n - 1; l++) {
+                    int dist = 
+                    dp[i][j] = Math.min(dp[i - 1][l], )
+                }
+            }
+        }
     }
 }
-
-// 3 <= N <= 500
-// nCk 
-// 0 -> 1 -> 2-> 3 -> 4
-// 어떤 점을 가지 않았을 때 빠지는 값을 미리 구할 수 있다.
-// 그렇다면 두점 연속으로 빠지면..?? 이건 의미 없는 것 같고
-// 500이면 n^3?? n! / (n - k)! 개 인데
-// 한 점을 기준으로 자신의 양 옆 점과의 거리를 구하고 거리가 가장 큰 점들을 빼주자.
