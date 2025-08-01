@@ -42,7 +42,7 @@ public class Main {
 
         int[] dp = new int[100001];
 
-        for (int i = 1; i < 100001; i++) 
+        for (int i = 1; i < 100001; i++)
             for (int j = 1; j < n + 1; j++) {
                 if (i >= arr[j].cost) {
                     dp[i] = Math.max(dp[i], dp[i - arr[j].cost] + arr[j].estimated);
@@ -53,6 +53,5 @@ public class Main {
                 }
             }
 
-        }
     }
 }
