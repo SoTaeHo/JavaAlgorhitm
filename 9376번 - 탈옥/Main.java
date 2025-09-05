@@ -1,155 +1,125 @@
-
 /* ************************************************************************** */
-/*                                                                            */
-/*                                                      :::    :::    :::     */
-/*   Problem Number: 9376                              :+:    :+:      :+:    */
-/*                                                    +:+    +:+        +:+   */
-/*   By: thxogh1 <boj.kr/u/thxogh1>                  +#+    +#+          +#+  */
-/*                                                  +#+      +#+        +#+   */
-/*   https://boj.kr/9376                           #+#        #+#      #+#    */
-/*   Solved: 2025/09/05 19:20:27 by thxogh1       ###          ###   ##.kr    */
-/*                                                                            */
-/* ************************************************************************** */
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.StringTokenizer;
+ /*                                                                            */
+ /*                                                      :::    :::    :::     */
+ /*   Problem Number: 9376                              :+:    :+:      :+:    */
+ /*                                                    +:+    +:+        +:+   */
+ /*   By: thxogh1 <boj.kr/u/thxogh1>                  +#+    +#+          +#+  */
+ /*                                                  +#+      +#+        +#+   */
+ /*   https://boj.kr/9376                           #+#        #+#      #+#    */
+ /*   Solved: 2025/09/05 19:20:27 by thxogh1       ###          ###   ##.kr    */
+ /*                                                                            */
+ /* ************************************************************************** */
+import java.io.*;
+import java.util.*;
 
 public class Main {
+
     static BufferedReader br;
     static StringTokenizer st;
+    static int h, w;
+    static int[][] graph;
+    static int[] dx = {-1, 1, 0, 0};
+    static int[] dy = {0, 0, -1, 1};
 
-    static class Edge implements Comparable<Edge> {
-        int x;
-        int y;
-        int weight;
+    static class Point {
 
-        Edge(int x, int y, int weight) {
+        int x, y;
+
+        Point(int x, int y) {
             this.x = x;
             this.y = y;
-            this.weight = weight;
-        }
-
-        @Override
-        public int compareTo(Main.Edge o) {
-            return Integer.compare(this.weight, o.weight);
         }
     }
 
-    static int[] dx = { -1, 1, 0, 0 };
-    static int[] dy = { 0, 0, -1, 1 };
+    static int[][] bfs(Point start) {
+        int[][] dist = new int[h + 2][w + 2];
+        for (int[] row : dist) {
+            Arrays.fill(row, Integer.MAX_VALUE);
+        }
 
-    static int dijkstra(PriorityQueue<Edge> pq, int[][] graph, int[][] dist, int w, int h) {
+        Deque<Point> dq = new ArrayDeque<>();
+        dq.add(start);
+        dist[start.x][start.y] = 0;
 
-        while (!pq.isEmpty()) {
-            Edge now = pq.poll();
+        while (!dq.isEmpty()) {
+            Point now = dq.poll();
+            int x = now.x, y = now.y;
 
-            if (now.weight > dist[now.x][now.y]) {
-                continue;
-            }
-
-            for (int i = 0; i < 4; i++) {
-                int nx = now.x + dx[i];
-                int ny = now.y + dy[i];
-
-                if (nx >= h || nx < 0 || ny >= w || ny < 0) {
+            for (int dir = 0; dir < 4; dir++) {
+                int nx = x + dx[dir];
+                int ny = y + dy[dir];
+                if (nx < 0 || ny < 0 || nx > h + 1 || ny > w + 1) {
                     continue;
                 }
                 if (graph[nx][ny] == -1) {
                     continue;
                 }
-
-                // 지나갈 수 있는 길인 경우
-                if (graph[nx][ny] == 0 && dist[nx][ny] > now.weight) {
-                    dist[nx][ny] = now.weight;
-                    pq.offer(new Edge(nx, ny, now.weight));
+                int cost = dist[x][y];
+                if (graph[nx][ny] == 2) {
+                    cost++;
                 }
-                // 열 수 있는 벽인 경우
-                else if (graph[nx][ny] == 2 && dist[nx][ny] > now.weight + 1) {
-                    dist[nx][ny] = now.weight + 1;
-                    graph[nx][ny] = 0;
-                    pq.offer(new Edge(nx, ny, now.weight + 1));
-                }
-                // 죄수 위치에 도착한 경우
-                else if (graph[nx][ny] == 3 && dist[nx][ny] > now.weight) {
-                    dist[nx][ny] = now.weight;
-                    graph[nx][ny] = 0;
-                    return dist[nx][ny];
+                if (dist[nx][ny] > cost) {
+                    dist[nx][ny] = cost;
+                    if (graph[nx][ny] == 2) {
+                        dq.addLast(new Point(nx, ny));
+                    } else {
+                        dq.addFirst(new Point(nx, ny));
+                    }
                 }
             }
         }
-        return 0;
+        return dist;
     }
 
     static void solve() throws Exception {
         st = new StringTokenizer(br.readLine());
-        int h = Integer.parseInt(st.nextToken());
-        int w = Integer.parseInt(st.nextToken());
+        h = Integer.parseInt(st.nextToken());
+        w = Integer.parseInt(st.nextToken());
 
-        int[][] graph = new int[h][w];
-        int[][] dist = new int[h][w];
-
-        for (int i = 0; i < h; i++) {
-            Arrays.fill(dist[i], Integer.MAX_VALUE);
+        graph = new int[h + 2][w + 2];
+        for (int[] row : graph) {
+            Arrays.fill(row, 0);
         }
+        List<Point> prisoners = new ArrayList<>();
 
-        PriorityQueue<Edge> pq = new PriorityQueue<>();
-
-        for (int i = 0; i < h; i++) {
+        for (int i = 1; i <= h; i++) {
             String str = br.readLine();
-            for (int j = 0; j < w; j++) {
-                if (str.charAt(j) == '*') {
+            for (int j = 1; j <= w; j++) {
+                char c = str.charAt(j - 1);
+                if (c == '*') {
                     graph[i][j] = -1;
-                } else if (str.charAt(j) == '#') {
+                } else if (c == '#') {
                     graph[i][j] = 2;
-                    if (i == 0 || i == h - 1 || j == 0 || j == w - 1) {
-                        pq.offer(new Edge(i, j, 1));
-                        dist[i][j] = 1;
-                    }
-                } else if (str.charAt(j) == '$') {
-                    graph[i][j] = 3;
-                } else if (str.charAt(j) == '.') {
-                    if (i == 0 || i == h - 1 || j == 0 || j == w - 1) {
-                        pq.offer(new Edge(i, j, 0));
-                        dist[i][j] = 0;
-                    }
+                } else if (c == '$') {
+                    prisoners.add(new Point(i, j));
+                    graph[i][j] = 0;
                 }
             }
         }
-        int first = dijkstra(pq, graph, dist, w, h);
-        pq.clear();
-        for (int i = 0; i < h; i++) {
-            Arrays.fill(dist[i], Integer.MAX_VALUE);
-        }
 
-        for (int i = 0; i < h; i++) {
-            for (int j = 0; j < w; j++) {
-                if (graph[i][j] == '#') {
-                    if (i == 0 || i == h - 1 || j == 0 || j == w - 1) {
-                        pq.offer(new Edge(i, j, 1));
-                        dist[i][j] = 1;
-                    }
-                } else if (graph[i][j] == '.') {
-                    if (i == 0 || i == h - 1 || j == 0 || j == w - 1) {
-                        pq.offer(new Edge(i, j, 0));
-                        dist[i][j] = 0;
-                    }
+        int[][] distOut = bfs(new Point(0, 0));
+        int[][] distA = bfs(prisoners.get(0));
+        int[][] distB = bfs(prisoners.get(1));
+        int ans = Integer.MAX_VALUE;
+        for (int i = 0; i <= h + 1; i++) {
+            for (int j = 0; j <= w + 1; j++) {
+                if (graph[i][j] == -1) {
+                    continue;
                 }
+                if (distOut[i][j] == Integer.MAX_VALUE
+                        || distA[i][j] == Integer.MAX_VALUE
+                        || distB[i][j] == Integer.MAX_VALUE) {
+                    continue;
+                }
+
+                int cost = distOut[i][j] + distA[i][j] + distB[i][j];
+                if (graph[i][j] == 2) {
+                    cost -= 2;
+                }
+                ans = Math.min(ans, cost);
             }
         }
-        int second = dijkstra(pq, graph, dist, w, h);
-        System.out.println("first : " + first);
-        System.out.println("second : " + second);
-        System.out.println(first + second);
-        // int ans = Math.max(dist[ansX.get(0)][ansY.get(0)],
-        // dist[ansX.get(1)][ansY.get(1)]);
-        // System.out.println("first : " + dist[ansX.get(0)][ansY.get(0)]);
-        // System.out.println("second : " + dist[ansX.get(1)][ansY.get(1)]);
-
-        // System.out.println(ans);
+        System.out.println(ans);
     }
 
     public static void main(String[] args) throws Exception {
@@ -157,6 +127,6 @@ public class Main {
         int T = Integer.parseInt(br.readLine());
         for (int t = 0; t < T; t++) {
             solve();
-        
+        }
     }
 }
