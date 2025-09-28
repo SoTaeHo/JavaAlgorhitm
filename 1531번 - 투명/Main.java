@@ -23,7 +23,7 @@ public class Main {
         int n = Integer.parseInt(st.nextToken());
         int m = Integer.parseInt(st.nextToken());
 
-        int[][] arr = new int[101][101]
+        int[][] arr = new int[101][101];
 
         for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
