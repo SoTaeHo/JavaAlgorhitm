@@ -41,7 +41,7 @@ public class Main {
 
             dx = -1000000000;
             for (int j = i + 1; j < N + 1; j++) {
-                double temp = (double) (building[j] - building[i]) / (j - i);
+                double temp = (double) (building[j] - building[i]) / xj - i);
                 if (temp > dx) {
                     right += 1;
                     dx = temp;
