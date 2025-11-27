@@ -34,7 +34,8 @@ public class Main {
             dp[cur][0] += dp[e][1];
             dp[cur][1] += Math.min(dp[e][0], dp[e][1]);
         }
-
+        int x = 10;
+        int y = 5;
     }
 
     public static void main(String[] args) throws Exception {
