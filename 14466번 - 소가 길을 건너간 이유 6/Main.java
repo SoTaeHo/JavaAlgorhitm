@@ -22,6 +22,7 @@ public class Main {
     static boolean[][][] blocked;
     static int[][] cows;
 
+    // 상하좌우
     static int[] dr = { -1, 1, 0, 0 };
     static int[] dc = { 0, 0, -1, 1 };
 
@@ -119,3 +120,4 @@ public class Main {
 
         return false;
     }
+}
