@@ -12,20 +12,60 @@
 /* ************************************************************************** */
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
 public class Main {
+    static List<Integer>[] graph;
+    static int[] match;
+    static boolean[] visited;
+
+    static boolean dfs(int u) {
+        for (int job : graph[u]) {
+            if (visited[job]) {
+                continue;
+            }
+            visited[job] = true;
+
+            if (match[job] == 0 || dfs(match[job])) {
+                match[job] = u;
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int n = Integer.parseInt(st.nextToken());
-        int m = Integer.parseInt(st.nextToken());
 
-        List<Integer>
-        for(int i = 0; i < n; i++) {
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
 
+        graph = new ArrayList[N + 1];
+        for (int i = 1; i <= N; i++) {
+            graph[i] = new ArrayList<>();
         }
+
+        for (int i = 1; i <= N; i++) {
+            st = new StringTokenizer(br.readLine());
+            int k = Integer.parseInt(st.nextToken());
+            for (int j = 0; j < k; j++) {
+                graph[i].add(Integer.parseInt(st.nextToken()));
+            }
+        }
+
+        match = new int[M + 1];
+
+        int ans = 0;
+        for (int i = 1; i <= N; i++) {
+            visited = new boolean[M + 1];
+            if (dfs(i)) {
+                ans++;
+            }
+        }
+
+        System.out.println(ans);
     }
 }
