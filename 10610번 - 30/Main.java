@@ -13,8 +13,6 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
 
 public class Main {
 
@@ -23,12 +21,6 @@ public class Main {
         String str = br.readLine();
 
         char[] arr = str.toCharArray();
-
-        StringBuilder sb = new StringBuilder();
-
-        for (char c : arr) {
-            sb.append(c);
-        }
 
         int sum = 0;
         boolean hasZero = false;
@@ -44,6 +36,8 @@ public class Main {
             return;
         }
 
+        Arrays.sort(arr);
+        StringBuilder sb = new StringBuilder();
         for (int i = arr.length - 1; i >= 0; i--) {
             sb.append(arr[i]);
         }
@@ -51,7 +45,3 @@ public class Main {
         System.out.println(sb);
     }
 }
-
-// 30 60 90 120 150 180 210 240 270 300
-// 330 360 390 420 450 480 510 540 570 600
-// 630 660 690 720 750 780 810 840 870 900
