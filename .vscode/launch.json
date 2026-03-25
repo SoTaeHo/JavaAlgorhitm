@@ -9,6 +9,13 @@
       "name": "Main",
       "request": "launch",
       "mainClass": "Main",
+      "projectName": "JavaAlgorhitm_c3c15605"
+    },
+    {
+      "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "Main",
       "projectName": "JavaAlgorhitm_e194b5a7"
     },
     {
