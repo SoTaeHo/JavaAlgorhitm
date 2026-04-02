@@ -85,7 +85,7 @@ public class Main {
                 if (graph[nx][ny] == 1) {
                     if (next.cnt < K && !visited[nx][ny][next.cnt + 1]) {
                         visited[nx][ny][next.cnt + 1] = true;
-                        q.add(new State(nx, ny, next.cnt + 1, next.w + 1));
+                    gi    q.add(new State(nx, ny, next.cnt + 1, next.w + 1));
                     }
                 } else if (graph[nx][ny] == 0) {
                     visited[nx][ny][next.cnt] = true;
