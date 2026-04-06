@@ -12,18 +12,23 @@
 /* ************************************************************************** */
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class Main {
+    static int n;
+    static int[][] weight;
+    static int[][] dp;
+    static final int INF = 987654321;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int n = Integer.parseInt(br.readLine());
+        n = Integer.parseInt(br.readLine());
 
-        StringTokenizer st = new StringTokenizer(br.readLine());
+        StringTokenizer st;
 
-        int[][] weight = new int[n][n];
+        weight = new int[n][n];
         for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
 
@@ -31,6 +36,39 @@ public class Main {
                 weight[i][j] = Integer.parseInt(st.nextToken());
             }
         }
+        dp = new int[n][1 << n];
+        for (int i = 0; i < n; i++) {
+            Arrays.fill(dp[i], -1);
+        }
 
+        System.out.println(solve(0, 1));
+
+    }
+
+    static int solve(int cur, int visited) {
+        if (visited == (1 << n) - 1) {
+            return weight[cur][0] != 0 ? weight[cur][0] : INF;
+        }
+
+        if (dp[cur][visited] != -1) {
+            return dp[cur][visited];
+        }
+
+        dp[cur][visited] = INF;
+
+        for (int next = 0; next < n; next++) {
+            if ((visited & (1 << next)) != 0) {
+                continue;
+            }
+
+            if (weight[cur][next] == 0) {
+                continue;
+            }
+
+            dp[cur][visited] = Math.min(dp[cur][visited], weight[cur][next] +
+                    solve(next, visited | (1 << next)));
+        }
+
+        return dp[cur][visited];
     }
 }
